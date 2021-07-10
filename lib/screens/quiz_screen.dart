@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:quiz_app/constants.dart';
+import 'package:quiz_app/controllers/progress_controller.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
 class QuizScreen extends StatelessWidget {
@@ -60,33 +62,51 @@ class ProgressBar extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(kDefualtRadius),
       ),
-      child: Stack(
-        children: [
-          LayoutBuilder(
-            builder: (ctx, constraints) {
-              return Container(
-                width: constraints.maxWidth * .1,
-                decoration: BoxDecoration(
-                    gradient: kPrimaryGradient,
-                    borderRadius: BorderRadius.circular(kDefualtRadius)),
-              );
-            },
-          ),
-          Positioned.fill(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('18 Sec'),
-                  WebsafeSvg.asset('assets/icons/clock.svg'),
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
+      child: GetBuilder<QuistionController>(
+          init: QuistionController(),
+          builder: (controller) {
+            return Stack(
+              children: [
+                LayoutBuilder(
+                  builder: (ctx, constraints) {
+                    var heightController = constraints.maxHeight *
+                                controller.animation.value *
+                                15 ==
+                            constraints.maxHeight
+                        ? constraints.maxHeight
+                        : constraints.maxHeight *
+                            controller.animation.value *
+                            15;
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        width:
+                            constraints.maxWidth * controller.animation.value,
+                        height: heightController,
+                        decoration: BoxDecoration(
+                            gradient: kPrimaryGradient,
+                            borderRadius: BorderRadius.circular(50)),
+                      ),
+                    );
+                  },
+                ),
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: kDefaultPadding / 2),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                            '${(controller.animation.value * 60).round()} Sec'),
+                        WebsafeSvg.asset('assets/icons/clock.svg'),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            );
+          }),
     );
   }
 }
